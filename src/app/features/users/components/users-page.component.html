@@ -1,0 +1,142 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <p class="eyebrow">Користувачі</p>
+      <h1>Управління користувачами</h1>
+      <p class="subtitle">Запрошуйте, редагуйте ролі та контактні дані працівників.</p>
+    </div>
+    <div class="header__actions">
+      <button type="button" class="ghost" (click)="refresh()" [disabled]="loading()">Оновити</button>
+      <button type="button" class="primary" (click)="startCreate()" [disabled]="loading()">Новий користувач</button>
+    </div>
+  </header>
+  <div class="card table-card">
+    <div class="table__header">
+      <div>
+        <p class="eyebrow">Список</p>
+        <h2>Існуючі користувачі</h2>
+      </div>
+      <span class="pill" *ngIf="loading()">Завантаження...</span>
+    </div>
+
+    <div *ngIf="!hasUsers() && !loading()" class="empty">
+      <p>Користувачів поки немає. Додайте першого.</p>
+    </div>
+
+    <table *ngIf="hasUsers()" class="table">
+      <thead>
+        <tr>
+          <th>Ім'я</th>
+          <th>Email</th>
+          <th>Роль</th>
+          <th>Дії</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users(); trackBy: trackById">
+          <td>
+            <div class="name-cell">
+              <span class="dot"></span>
+              <div>
+                <div class="title">{{ user.name }} {{ user.surname }}</div>
+                <div class="id">{{ user.id }}</div>
+              </div>
+            </div>
+          </td>
+          <td>{{ user.email }}</td>
+          <td>
+            <span class="badge">{{ roleLabel(user.role) }}</span>
+          </td>
+          <td class="actions">
+            <button type="button" class="ghost" (click)="editUser(user)" [disabled]="loading()">Редагувати</button>
+            <button type="button" class="danger" (click)="openDeleteDialog(user)" [disabled]="loading()">Видалити</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="pendingDelete()">
+    <div class="modal">
+      <h3>Видалити користувача?</h3>
+      <p class="modal__text">Користувача "{{ pendingDelete()?.name }} {{ pendingDelete()?.surname }}" буде видалено.</p>
+      <div class="modal__actions">
+        <button type="button" class="ghost" (click)="cancelDelete()" [disabled]="loading()">Скасувати</button>
+        <button type="button" class="danger" (click)="confirmDelete()" [disabled]="loading()">Видалити</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="showForm()">
+    <div class="modal modal--form">
+      <div class="modal__header">
+        <div>
+          <p class="eyebrow">{{ editingId() ? 'Редагування' : 'Запрошення' }}</p>
+          <h3>{{ editingId() ? 'Оновити користувача' : 'Додати користувача' }}</h3>
+        </div>
+        <button class="ghost close" type="button" (click)="closeForm()" [disabled]="loading()">✕</button>
+      </div>
+
+      <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="field-grid">
+          <label class="field">
+            <span>Ім'я</span>
+            <input type="text" placeholder="Олена" formControlName="name" />
+            <small class="error" *ngIf="form.controls.name.touched && form.controls.name.invalid">
+              @if (form.controls.name.errors?.['required']) { Обов'язкове поле }
+              @else if (form.controls.name.errors?.['pattern']) { Лише літери та пробіли }
+              @else { До 80 символів }
+            </small>
+          </label>
+
+          <label class="field">
+            <span>Прізвище</span>
+            <input type="text" placeholder="Шевченко" formControlName="surname" />
+            <small class="error" *ngIf="form.controls.surname.touched && form.controls.surname.invalid">
+              @if (form.controls.surname.errors?.['required']) { Обов'язкове поле }
+              @else if (form.controls.surname.errors?.['pattern']) { Лише літери та пробіли }
+              @else { До 80 символів }
+            </small>
+          </label>
+        </div>
+
+        <label class="field">
+          <span>Email</span>
+          <input type="email" placeholder="name@company.com" formControlName="email" />
+          <small class="error" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+            Некоректний email.
+          </small>
+        </label>
+
+        <div class="field-grid">
+          <label class="field">
+            <span>Роль</span>
+            <select formControlName="role">
+              <option *ngFor="let option of roleOptions" [ngValue]="option.value">{{ option.label }}</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Пароль (лише при створенні)</span>
+            <input
+              type="password"
+              placeholder="мін. 6 символів"
+              formControlName="password"
+              [disabled]="!!editingId()"
+            />
+            <small class="hint" *ngIf="editingId()">Пароль не змінюється під час редагування.</small>
+          </label>
+        </div>
+
+        <div class="form__actions">
+          <button type="button" class="ghost" (click)="closeForm()" [disabled]="loading()">Скасувати</button>
+          <button type="submit" class="primary" [disabled]="loading()">
+            {{ editingId() ? 'Зберегти зміни' : 'Створити' }}
+          </button>
+        </div>
+
+        <p class="error" *ngIf="error()">{{ error() }}</p>
+      </form>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,44 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <p class="eyebrow">Огляд</p>
+      <h1>Панель управління</h1>
+      <p class="subtitle">Короткі метрики по бюджетах, закупівлях та користувачах.</p>
+    </div>
+  </header>
+
+  <div class="cards" *ngIf="summary() as data">
+    <article class="card">
+      <p class="eyebrow">Бюджети</p>
+      <h2>{{ data.budgetsTotal }}</h2>
+      <p class="muted">Активні бюджети</p>
+    </article>
+    <article class="card">
+      <p class="eyebrow">Закупівлі</p>
+      <h2>{{ data.purchasesPending }}</h2>
+      <p class="muted">Запити в очікуванні</p>
+    </article>
+    <article class="card">
+      <p class="eyebrow">Постачальники</p>
+      <h2>{{ data.suppliersCount }}</h2>
+      <p class="muted">Активні контрагенти</p>
+    </article>
+    <article class="card">
+      <p class="eyebrow">Користувачі</p>
+      <h2>{{ data.usersCount }}</h2>
+      <p class="muted">У системі</p>
+    </article>
+    <article class="card">
+      <p class="eyebrow">Витрати</p>
+      <h2>{{ data.spendToDate | number:'1.0-0' }} ₴</h2>
+      <p class="muted">Сумарно за період</p>
+    </article>
+  </div>
+
+  <section class="stats" *ngIf="stats().length">
+    <div class="stat" *ngFor="let stat of stats()">
+      <div class="stat__value">{{ stat.value }}<span class="unit">{{ stat.unit }}</span></div>
+      <div class="stat__label">{{ stat.label }}</div>
+    </div>
+  </section>
+</section>

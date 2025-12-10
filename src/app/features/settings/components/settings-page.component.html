@@ -1,0 +1,19 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <p class="eyebrow">Налаштування</p>
+      <h1>Параметри застосунку</h1>
+      <p class="subtitle">Увімкніть потрібні опції для команди.</p>
+    </div>
+  </header>
+
+  <div class="card" *ngFor="let option of options">
+    <div class="card__header">
+      <div>
+        <h3>{{ option.label }}</h3>
+        <p class="muted">{{ option.description }}</p>
+      </div>
+      <span class="badge" [class.on]="option.enabled">{{ option.enabled ? 'On' : 'Off' }}</span>
+    </div>
+  </div>
+</section>

@@ -1,18 +1,36 @@
 import { Routes } from '@angular/router';
-import { BudgetsPageComponent } from './features/budgets/budgets-page.component';
-import { UsersPageComponent } from './features/users/users-page.component';
-import { CategoriesPageComponent } from './features/categories/categories-page.component';
-import { SuppliersPageComponent } from './features/suppliers/suppliers-page.component';
-import { PurchasesPageComponent } from './features/purchases/purchases-page.component';
 import { DummyGuard } from './core/guards/dummy.guard';
 
 export const routes: Routes = [
-	{ path: '', pathMatch: 'full', redirectTo: 'budgets' },
-	{ path: 'budgets', component: BudgetsPageComponent },
-	{ path: 'users', component: UsersPageComponent },
-	{ path: 'categories', component: CategoriesPageComponent },
-	{ path: 'suppliers', component: SuppliersPageComponent },
-	{ path: 'purchases', component: PurchasesPageComponent },
+	{ path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+	{
+		path: 'dashboard',
+		loadChildren: () => import('./features/dashboard/dashboard.module').then((m) => m.DashboardModule)
+	},
+	{
+		path: 'budgets',
+		loadChildren: () => import('./features/budgets/budgets.module').then((m) => m.BudgetsModule)
+	},
+	{
+		path: 'users',
+		loadChildren: () => import('./features/users/users.module').then((m) => m.UsersModule)
+	},
+	{
+		path: 'categories',
+		loadChildren: () => import('./features/categories/categories.module').then((m) => m.CategoriesModule)
+	},
+	{
+		path: 'suppliers',
+		loadChildren: () => import('./features/suppliers/suppliers.module').then((m) => m.SuppliersModule)
+	},
+	{
+		path: 'purchases',
+		loadChildren: () => import('./features/purchases/purchases.module').then((m) => m.PurchasesModule)
+	},
+	{
+		path: 'settings',
+		loadChildren: () => import('./features/settings/settings.module').then((m) => m.SettingsModule)
+	},
 	{
 		path: 'cli-sample',
 		canActivate: [DummyGuard],

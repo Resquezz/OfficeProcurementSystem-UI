@@ -1,0 +1,96 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <p class="eyebrow">Категорії</p>
+      <h1>Управління категоріями</h1>
+      <p class="subtitle">Організовуйте витрати за зрозумілими категоріями.</p>
+    </div>
+    <div class="header__actions">
+      <button type="button" class="ghost" (click)="refresh()" [disabled]="loading()">Оновити</button>
+      <button type="button" class="primary" (click)="startCreate()" [disabled]="loading()">Нова категорія</button>
+    </div>
+  </header>
+  <div class="card table-card">
+    <div class="table__header">
+      <div>
+        <p class="eyebrow">Список</p>
+        <h2>Існуючі категорії</h2>
+      </div>
+      <span class="pill" *ngIf="loading()">Завантаження...</span>
+    </div>
+
+    <div *ngIf="!hasCategories() && !loading()" class="empty">
+      <p>Категорій поки що немає. Додайте першу.</p>
+    </div>
+
+    <table *ngIf="hasCategories()" class="table">
+      <thead>
+        <tr>
+          <th>Назва</th>
+          <th>Дії</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let category of categories(); trackBy: trackById">
+          <td>
+            <div class="name-cell">
+              <span class="dot"></span>
+              <div>
+                <div class="title">{{ category.name }}</div>
+                <div class="id">{{ category.id }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="actions">
+            <button type="button" class="ghost" (click)="editCategory(category)" [disabled]="loading()">Редагувати</button>
+            <button type="button" class="danger" (click)="openDeleteDialog(category)" [disabled]="loading()">Видалити</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="pendingDelete()">
+    <div class="modal">
+      <h3>Видалити категорію?</h3>
+      <p class="modal__text">Категорію "{{ pendingDelete()?.name }}" буде видалено.</p>
+      <div class="modal__actions">
+        <button type="button" class="ghost" (click)="cancelDelete()" [disabled]="loading()">Скасувати</button>
+        <button type="button" class="danger" (click)="confirmDelete()" [disabled]="loading()">Видалити</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="showForm()">
+    <div class="modal modal--form">
+      <div class="modal__header">
+        <div>
+          <p class="eyebrow">{{ editingId() ? 'Редагування' : 'Створення' }}</p>
+          <h3>{{ editingId() ? 'Оновити категорію' : 'Додати категорію' }}</h3>
+        </div>
+        <button class="ghost close" type="button" (click)="closeForm()" [disabled]="loading()">✕</button>
+      </div>
+
+      <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="field">
+          <span>Назва</span>
+          <input type="text" placeholder="Наприклад: Підписки" formControlName="name" />
+          <small class="error" *ngIf="form.controls.name.touched && form.controls.name.invalid">
+            @if (form.controls.name.errors?.['required']) { Обов'язкове поле }
+            @else if (form.controls.name.errors?.['pattern']) { Літери, цифри, пробіли, апостроф, дефіс }
+            @else { До 120 символів }
+          </small>
+        </label>
+
+        <div class="form__actions">
+          <button type="button" class="ghost" (click)="closeForm()" [disabled]="loading()">Скасувати</button>
+          <button type="submit" class="primary" [disabled]="loading()">
+            {{ editingId() ? 'Зберегти зміни' : 'Створити' }}
+          </button>
+        </div>
+
+        <p class="error" *ngIf="error()">{{ error() }}</p>
+      </form>
+    </div>
+  </div>
+</section>
