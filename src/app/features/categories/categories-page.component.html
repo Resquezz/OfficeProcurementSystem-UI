@@ -1,0 +1,93 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <p class="eyebrow">Категорії</p>
+      <h1>Категорії витрат</h1>
+      <p class="subtitle">Додавайте та редагуйте категорії для майбутніх закупівель.</p>
+    </div>
+    <div class="header__actions">
+      <button type="button" class="ghost" (click)="refresh()" [disabled]="loading()">Оновити</button>
+      <button type="button" class="primary" (click)="startCreate()" [disabled]="loading()">Нова категорія</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <form class="card form" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form__header">
+        <div>
+          <p class="eyebrow">{{ editingId() ? 'Редагування' : 'Створення' }}</p>
+          <h2>{{ editingId() ? 'Оновити категорію' : 'Додати категорію' }}</h2>
+        </div>
+        <span class="pill" *ngIf="loading()">Обробка...</span>
+      </div>
+
+      <label class="field">
+        <span>Назва</span>
+        <input type="text" placeholder="Наприклад: Обладнання" formControlName="name" />
+        <small class="error" *ngIf="form.controls.name.touched && form.controls.name.invalid">
+          Обов'язкове поле, до 120 символів.
+        </small>
+      </label>
+
+      <div class="form__actions">
+        <button type="submit" class="primary" [disabled]="loading()">
+          {{ editingId() ? 'Зберегти зміни' : 'Створити' }}
+        </button>
+        <button type="button" class="ghost" (click)="startCreate()" [disabled]="loading()">Очистити</button>
+      </div>
+
+      <p class="error" *ngIf="error()">{{ error() }}</p>
+    </form>
+
+    <div class="card table-card">
+      <div class="table__header">
+        <div>
+          <p class="eyebrow">Список</p>
+          <h2>Існуючі категорії</h2>
+        </div>
+        <span class="pill" *ngIf="loading()">Завантаження...</span>
+      </div>
+
+      <div *ngIf="!hasCategories() && !loading()" class="empty">
+        <p>Категорій поки немає. Додайте першу, щоб стартувати каталог.</p>
+      </div>
+
+      <table *ngIf="hasCategories()" class="table">
+        <thead>
+          <tr>
+            <th>Назва</th>
+            <th>Дії</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of categories(); trackBy: trackById">
+            <td>
+              <div class="name-cell">
+                <span class="dot"></span>
+                <div>
+                  <div class="title">{{ category.name }}</div>
+                  <div class="id">{{ category.id }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="actions">
+              <button type="button" class="ghost" (click)="editCategory(category)" [disabled]="loading()">Редагувати</button>
+              <button type="button" class="danger" (click)="openDeleteDialog(category)" [disabled]="loading()">Видалити</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="pendingDelete()">
+    <div class="modal">
+      <h3>Видалити категорію?</h3>
+      <p class="modal__text">Категорію "{{ pendingDelete()?.name }}" буде видалено.</p>
+      <div class="modal__actions">
+        <button type="button" class="ghost" (click)="cancelDelete()" [disabled]="loading()">Скасувати</button>
+        <button type="button" class="danger" (click)="confirmDelete()" [disabled]="loading()">Видалити</button>
+      </div>
+    </div>
+  </div>
+</section>

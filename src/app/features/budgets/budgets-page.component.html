@@ -1,0 +1,117 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <p class="eyebrow">Бюджети</p>
+      <h1>Керування бюджетами</h1>
+      <p class="subtitle">Відстежуйте виділені та доступні кошти по кожному бюджету.</p>
+    </div>
+    <div class="header__actions">
+      <button type="button" class="ghost" (click)="refresh()" [disabled]="loading()">Оновити</button>
+      <button type="button" class="primary" (click)="startCreate()" [disabled]="loading()">Новий бюджет</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <form class="card form" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form__header">
+        <div>
+          <p class="eyebrow">{{ editingId() ? 'Редагування' : 'Створення' }}</p>
+          <h2>{{ editingId() ? 'Оновити бюджет' : 'Додати бюджет' }}</h2>
+        </div>
+        <span class="pill" *ngIf="loading()">Обробка...</span>
+      </div>
+
+      <label class="field">
+        <span>Назва</span>
+        <input type="text" placeholder="Наприклад: Маркетинг" formControlName="name" />
+        <small class="error" *ngIf="form.controls.name.touched && form.controls.name.invalid">
+          Обов'язкове поле, до 120 символів.
+        </small>
+      </label>
+
+      <div class="field-grid">
+        <label class="field">
+          <span>Загальна сума</span>
+          <input type="number" min="0" step="100" formControlName="generalAmount" />
+          <small class="error" *ngIf="form.controls.generalAmount.touched && form.controls.generalAmount.invalid">
+            Вкажіть невід'ємну суму.
+          </small>
+        </label>
+
+        <label class="field">
+          <span>Доступна сума</span>
+          <input type="number" min="0" step="100" formControlName="availableAmount" [readonly]="!editingId()" />
+          <small class="hint" *ngIf="!editingId()">При створенні заповнюється автоматично.</small>
+        </label>
+      </div>
+
+      <div class="form__actions">
+        <button type="submit" class="primary" [disabled]="loading()">
+          {{ editingId() ? 'Зберегти зміни' : 'Створити' }}
+        </button>
+        <button type="button" class="ghost" (click)="startCreate()" [disabled]="loading()">Очистити</button>
+      </div>
+
+      <p class="error" *ngIf="error()">{{ error() }}</p>
+    </form>
+
+    <div class="card table-card">
+      <div class="table__header">
+        <div>
+          <p class="eyebrow">Список</p>
+          <h2>Існуючі бюджети</h2>
+        </div>
+        <span class="pill" *ngIf="loading()">Завантаження...</span>
+      </div>
+
+      <div *ngIf="!hasBudgets() && !loading()" class="empty">
+        <p>Поки що немає бюджетів. Створіть перший, щоб розпочати контроль витрат.</p>
+      </div>
+
+      <table *ngIf="hasBudgets()" class="table">
+        <thead>
+          <tr>
+            <th>Назва</th>
+            <th>Загальна сума</th>
+            <th>Доступно</th>
+            <th>Дії</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let budget of budgets(); trackBy: trackByGuid">
+            <td>
+              <div class="name-cell">
+                <span class="dot"></span>
+                <div>
+                  <div class="title">{{ budget.name }}</div>
+                  <div class="id">{{ budget.guid }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ budget.generalAmount | currency:'UAH':'symbol-narrow':'1.0-0' }}</td>
+            <td>
+              <span class="available" [class.available--low]="budget.availableAmount < budget.generalAmount * 0.2">
+                {{ budget.availableAmount | currency:'UAH':'symbol-narrow':'1.0-0' }}
+              </span>
+            </td>
+            <td class="actions">
+              <button type="button" class="ghost" (click)="editBudget(budget)" [disabled]="loading()">Редагувати</button>
+              <button type="button" class="danger" (click)="openDeleteDialog(budget)" [disabled]="loading()">Видалити</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="pendingDelete()">
+    <div class="modal">
+      <h3>Видалити бюджет?</h3>
+      <p class="modal__text">Бюджет "{{ pendingDelete()?.name }}" буде видалено безповоротно.</p>
+      <div class="modal__actions">
+        <button type="button" class="ghost" (click)="cancelDelete()" [disabled]="loading()">Скасувати</button>
+        <button type="button" class="danger" (click)="confirmDelete()" [disabled]="loading()">Видалити</button>
+      </div>
+    </div>
+  </div>
+</section>

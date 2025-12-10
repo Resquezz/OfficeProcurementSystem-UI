@@ -1,0 +1,21 @@
+﻿<div class="shell">
+  <header class="shell__header">
+    <div class="brand">
+      <span class="brand__dot"></span>
+      <div>
+        <div class="brand__title">Office Procurement</div>
+        <p class="brand__subtitle">Контроль бюджетів та закупівель</p>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a routerLink="/budgets" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Бюджети</a>
+      <a routerLink="/users" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Користувачі</a>
+      <a routerLink="/categories" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Категорії</a>
+    </nav>
+  </header>
+
+  <main class="shell__main">
+    <router-outlet></router-outlet>
+  </main>
+</div>
