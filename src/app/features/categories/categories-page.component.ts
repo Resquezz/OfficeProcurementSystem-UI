@@ -15,16 +15,24 @@ export class CategoriesPageComponent implements OnInit {
   private readonly categoriesService = inject(CategoriesService);
   private readonly fb = inject(FormBuilder);
 
+  // At least one non-space; allow letters, digits, apostrophes, dashes, spaces.
+  private readonly namePattern = /^(?!\s*$)[A-Za-zА-Яа-яЁёІіЇїЄєҐґ0-9'’\-\s]+$/;
+
   readonly categories = signal<CategoryDto[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly editingId = signal<string | null>(null);
   readonly pendingDelete = signal<CategoryDto | null>(null);
+  readonly showForm = signal(false);
 
   readonly hasCategories = computed(() => this.categories().length > 0);
 
   readonly form = this.fb.nonNullable.group({
-    name: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(120)])
+    name: this.fb.nonNullable.control('', [
+      Validators.required,
+      Validators.maxLength(120),
+      Validators.pattern(this.namePattern)
+    ])
   });
 
   ngOnInit(): void {
@@ -36,13 +44,23 @@ export class CategoriesPageComponent implements OnInit {
   }
 
   startCreate(): void {
-    this.editingId.set(null);
-    this.form.reset({ name: '' });
+    this.resetFormValues();
+    this.showForm.set(true);
   }
 
   editCategory(category: CategoryDto): void {
     this.editingId.set(category.id);
     this.form.patchValue({ name: category.name });
+    this.showForm.set(true);
+  }
+
+  closeForm(): void {
+    this.showForm.set(false);
+  }
+
+  private resetFormValues(): void {
+    this.editingId.set(null);
+    this.form.reset({ name: '' });
   }
 
   submit(): void {
@@ -63,7 +81,8 @@ export class CategoriesPageComponent implements OnInit {
         next: (updated) => {
           this.categories.update((items) => items.map((item) => (item.id === updated.id ? updated : item)));
           this.loading.set(false);
-          this.startCreate();
+          this.closeForm();
+          this.resetFormValues();
         },
         error: (err) => this.handleError(err)
       });
@@ -73,7 +92,8 @@ export class CategoriesPageComponent implements OnInit {
         next: (created) => {
           this.categories.update((items) => [created, ...items]);
           this.loading.set(false);
-          this.startCreate();
+          this.closeForm();
+          this.resetFormValues();
         },
         error: (err) => this.handleError(err)
       });
@@ -103,7 +123,8 @@ export class CategoriesPageComponent implements OnInit {
         this.loading.set(false);
         this.pendingDelete.set(null);
         if (this.editingId() === category.id) {
-          this.startCreate();
+          this.resetFormValues();
+          this.closeForm();
         }
       },
       error: (err) => this.handleError(err)

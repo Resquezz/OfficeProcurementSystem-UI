@@ -15,18 +15,36 @@ export class BudgetsPageComponent implements OnInit {
   private readonly budgetsService = inject(BudgetsService);
   private readonly fb = inject(FormBuilder);
 
+  // Require at least one non-space; allow letters, digits, apostrophes, dashes, and spaces for budget names.
+  private readonly namePattern = /^(?!\s*$)[A-Za-zА-Яа-яЁёІіЇїЄєҐґ0-9'’\-\s]+$/;
+  // Numeric with optional decimal; disallow whitespace-only input.
+  private readonly amountPattern = /^(?!\s*$)\d+(\.\d+)?$/;
+
   readonly budgets = signal<Budget[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly editingId = signal<string | null>(null);
   readonly pendingDelete = signal<Budget | null>(null);
+  readonly showForm = signal(false);
 
   readonly hasBudgets = computed(() => this.budgets().length > 0);
 
   readonly form = this.fb.nonNullable.group({
-    name: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(120)]),
-    generalAmount: this.fb.nonNullable.control(0, [Validators.required, Validators.min(0)]),
-    availableAmount: this.fb.nonNullable.control(0, [Validators.required, Validators.min(0)])
+    name: this.fb.nonNullable.control('', [
+      Validators.required,
+      Validators.maxLength(120),
+      Validators.pattern(this.namePattern)
+    ]),
+    generalAmount: this.fb.nonNullable.control(0, [
+      Validators.required,
+      Validators.min(0),
+      Validators.pattern(this.amountPattern)
+    ]),
+    availableAmount: this.fb.nonNullable.control(0, [
+      Validators.required,
+      Validators.min(0),
+      Validators.pattern(this.amountPattern)
+    ])
   });
 
   ngOnInit(): void {
@@ -38,8 +56,8 @@ export class BudgetsPageComponent implements OnInit {
   }
 
   startCreate(): void {
-    this.editingId.set(null);
-    this.form.reset({ name: '', generalAmount: 0, availableAmount: 0 });
+    this.resetFormValues();
+    this.showForm.set(true);
   }
 
   editBudget(budget: Budget): void {
@@ -49,6 +67,16 @@ export class BudgetsPageComponent implements OnInit {
       generalAmount: budget.generalAmount,
       availableAmount: budget.availableAmount
     });
+    this.showForm.set(true);
+  }
+
+  closeForm(): void {
+    this.showForm.set(false);
+  }
+
+  private resetFormValues(): void {
+    this.editingId.set(null);
+    this.form.reset({ name: '', generalAmount: 0, availableAmount: 0 });
   }
 
   submit(): void {
@@ -79,7 +107,8 @@ export class BudgetsPageComponent implements OnInit {
             items.map((item) => (item.guid === updated.guid ? updated : item))
           );
           this.loading.set(false);
-          this.startCreate();
+          this.showForm.set(false);
+          this.resetFormValues();
         },
         error: (err) => this.handleError(err)
       });
@@ -93,7 +122,8 @@ export class BudgetsPageComponent implements OnInit {
         next: (created) => {
           this.budgets.update((items) => [created, ...items]);
           this.loading.set(false);
-          this.startCreate();
+          this.showForm.set(false);
+          this.resetFormValues();
         },
         error: (err) => this.handleError(err)
       });

@@ -12,19 +12,13 @@
   gap: 1rem;
 }
 
-.layout {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 1rem;
-  align-items: start;
-}
-
 .card {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 1rem;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  margin-top: 0.5rem;
 }
 
 .form {
@@ -244,6 +238,28 @@ button.danger:hover:not(:disabled) {
   width: min(420px, 100%);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
   border: 1px solid #e2e8f0;
+}
+
+.modal--form {
+  width: min(560px, 100%);
+}
+
+.modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.close {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  border-radius: 10px;
+  padding: 0;
 }
 
 .modal h3 {

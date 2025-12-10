@@ -20,11 +20,15 @@ export class UsersPageComponent implements OnInit {
   private readonly usersService = inject(UsersService);
   private readonly fb = inject(FormBuilder);
 
+  // Require at least one non-space while allowing letters, apostrophes, dashes, and spaces.
+  private readonly namePattern = /^(?!\s*$)[A-Za-zА-Яа-яЁёІіЇїЄєҐґ'’\-\s]+$/;
+
   readonly users = signal<UserDto[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly editingId = signal<string | null>(null);
   readonly pendingDelete = signal<UserDto | null>(null);
+  readonly showForm = signal(false);
 
   readonly hasUsers = computed(() => this.users().length > 0);
 
@@ -40,8 +44,16 @@ export class UsersPageComponent implements OnInit {
   }
 
   readonly form = this.fb.nonNullable.group({
-    name: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(80)]),
-    surname: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(80)]),
+    name: this.fb.nonNullable.control('', [
+      Validators.required,
+      Validators.maxLength(80),
+      Validators.pattern(this.namePattern)
+    ]),
+    surname: this.fb.nonNullable.control('', [
+      Validators.required,
+      Validators.maxLength(80),
+      Validators.pattern(this.namePattern)
+    ]),
     email: this.fb.nonNullable.control('', [Validators.required, Validators.email, Validators.maxLength(120)]),
     role: this.fb.nonNullable.control<UserRole>(UserRole.Employee, [Validators.required]),
     password: this.fb.nonNullable.control('', [])
@@ -56,16 +68,8 @@ export class UsersPageComponent implements OnInit {
   }
 
   startCreate(): void {
-    this.editingId.set(null);
-    this.form.reset({
-      name: '',
-      surname: '',
-      email: '',
-      role: UserRole.Employee,
-      password: ''
-    });
-    this.form.controls.password.setValidators([Validators.required, Validators.minLength(6)]);
-    this.form.controls.password.updateValueAndValidity();
+    this.resetFormValues();
+    this.showForm.set(true);
   }
 
   editUser(user: UserDto): void {
@@ -78,6 +82,24 @@ export class UsersPageComponent implements OnInit {
       password: ''
     });
     this.form.controls.password.clearValidators();
+    this.form.controls.password.updateValueAndValidity();
+    this.showForm.set(true);
+  }
+
+  closeForm(): void {
+    this.showForm.set(false);
+  }
+
+  private resetFormValues(): void {
+    this.editingId.set(null);
+    this.form.reset({
+      name: '',
+      surname: '',
+      email: '',
+      role: UserRole.Employee,
+      password: ''
+    });
+    this.form.controls.password.setValidators([Validators.required, Validators.minLength(6)]);
     this.form.controls.password.updateValueAndValidity();
   }
 
@@ -106,7 +128,8 @@ export class UsersPageComponent implements OnInit {
         next: (updated) => {
           this.users.update((items) => items.map((item) => (item.id === updated.id ? updated : item)));
           this.loading.set(false);
-          this.startCreate();
+          this.closeForm();
+          this.resetFormValues();
         },
         error: (err) => this.handleError(err)
       });
@@ -129,7 +152,8 @@ export class UsersPageComponent implements OnInit {
         next: (created) => {
           this.users.update((items) => [created, ...items]);
           this.loading.set(false);
-          this.startCreate();
+          this.closeForm();
+          this.resetFormValues();
         },
         error: (err) => this.handleError(err)
       });
@@ -159,7 +183,8 @@ export class UsersPageComponent implements OnInit {
         this.loading.set(false);
         this.pendingDelete.set(null);
         if (this.editingId() === user.id) {
-          this.startCreate();
+          this.resetFormValues();
+          this.closeForm();
         }
       },
       error: (err) => this.handleError(err)
