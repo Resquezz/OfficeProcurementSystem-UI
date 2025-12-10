@@ -1,3 +1,8 @@
+@import 'assets/styles/variables';
+@import 'assets/styles/animations';
+@import 'assets/styles/mixins';
+@import 'assets/styles/tables';
+
 /* Global base styles */
 * {
 	box-sizing: border-box;
@@ -6,6 +11,8 @@
 body {
 	margin: 0;
 	background: #eef2f7;
+	font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+	color: $text;
 }
 
 table {

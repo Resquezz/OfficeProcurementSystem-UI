@@ -3,17 +3,18 @@
     <div class="brand">
       <span class="brand__dot"></span>
       <div>
-        <div class="brand__title">Office Procurement</div>
+        <div class="brand__title">{{ 'office procurement' | titlecaseCustom }}</div>
         <p class="brand__subtitle">Контроль бюджетів та закупівель</p>
       </div>
     </div>
 
     <nav class="nav">
-      <a routerLink="/budgets" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Бюджети</a>
+      <a routerLink="/budgets" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" appAutoFocus>Бюджети</a>
       <a routerLink="/users" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Користувачі</a>
       <a routerLink="/categories" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Категорії</a>
       <a routerLink="/suppliers" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Постачальники</a>
       <a routerLink="/purchases" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Закупівлі</a>
+      <a routerLink="/cli-sample" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">CLI sample</a>
     </nav>
   </header>
 
