@@ -15,7 +15,7 @@ export class CategoriesPageComponent implements OnInit {
   private readonly categoriesService = inject(CategoriesService);
   private readonly fb = inject(FormBuilder);
 
-  // At least one non-space; allow letters, digits, apostrophes, dashes, spaces.
+
   private readonly namePattern = /^(?!\s*$)[A-Za-zА-Яа-яЁёІіЇїЄєҐґ0-9'’\-\s]+$/;
 
   readonly categories = signal<CategoryDto[]>([]);

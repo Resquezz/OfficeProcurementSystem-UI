@@ -18,9 +18,7 @@ export class SuppliersPageComponent implements OnInit {
   private readonly categoriesService = inject(CategoriesService);
   private readonly fb = inject(FormBuilder);
 
-  // Require at least one non-space; allow letters, digits, apostrophes, dashes, and spaces.
-  private readonly namePattern = /^(?!\s*$)[A-Za-zА-Яа-яЁёІіЇїЄєҐґ0-9'’\-\s]+$/;
-  // Allow any non-empty, non-whitespace contact info up to max length.
+  private readonly namePattern = /^(?!\s*$)[A-Za-zА-Яа-яЁёІіЇїЄєҐґ0-9''\-\s]+$/;
   private readonly contactPattern = /^(?!\s*$).+/;
 
   readonly suppliers = signal<SupplierDto[]>([]);
@@ -182,7 +180,6 @@ export class SuppliersPageComponent implements OnInit {
     this.categoriesService.getCategories().subscribe({
       next: (data) => {
         this.categories.set(data);
-        // Set default category for new forms if empty.
         if (!this.editingId()) {
           const currentCategory = this.form.controls.categoryId.value;
           if (!currentCategory) {
