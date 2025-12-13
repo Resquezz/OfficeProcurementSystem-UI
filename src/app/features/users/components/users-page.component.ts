@@ -20,7 +20,7 @@ export class UsersPageComponent implements OnInit {
   private readonly usersService = inject(UsersService);
   private readonly fb = inject(FormBuilder);
 
-  // Require at least one non-space while allowing letters, apostrophes, dashes, and spaces.
+
   private readonly namePattern = /^(?!\s*$)[A-Za-zА-Яа-яЁёІіЇїЄєҐґ'’\-\s]+$/;
 
   readonly users = signal<UserDto[]>([]);

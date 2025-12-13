@@ -15,9 +15,7 @@ export class BudgetsPageComponent implements OnInit {
   private readonly budgetsService = inject(BudgetsService);
   private readonly fb = inject(FormBuilder);
 
-  // Require at least one non-space; allow letters, digits, apostrophes, dashes, and spaces for budget names.
   private readonly namePattern = /^(?!\s*$)[A-Za-zА-Яа-яЁёІіЇїЄєҐґ0-9'’\-\s]+$/;
-  // Numeric with optional decimal; disallow whitespace-only input.
   private readonly amountPattern = /^(?!\s*$)\d+(\.\d+)?$/;
 
   readonly budgets = signal<Budget[]>([]);
